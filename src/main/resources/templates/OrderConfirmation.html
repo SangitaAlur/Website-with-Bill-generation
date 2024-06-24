@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Order Confirmation</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Thank You For Shopping!</h2>
+        <p th:text="${message}"></p>
+	<a class="btn btn-outline-dark" href="/products">Continue Shopping</a>
+	</div>
+</body>
+</html>
