@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Billing</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+   
+</head>
+<body>
+    <div class="container">
+        <h2 class="mb-4 text-center">Billing Details</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Delivery Address:</h4>
+                        <p class="card-text" th:utext="${deliveryAddress}"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Seller Address:</h4>
+                        <p class="card-text" th:utext="${sellerAddress}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card mt-4">
+            <div class="card-body">
+                <h4 class="card-title">Total Amount:</h4>
+                <p class="card-text">Rs. <span th:text="${totalAmount}"></span></p>
+            </div>
+        </div>
+        <form th:action="@{/placeOrder}" method="post">
+            <div class="text-center">
+                <button type="submit" class="btn btn-outline-dark">Place Order</button>
+            </div>
+        </form>
+    </div>
+    <!--<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>-->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+</html>

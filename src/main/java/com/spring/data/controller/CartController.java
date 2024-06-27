@@ -12,83 +12,92 @@ import com.spring.data.service.CartService;
 import jakarta.servlet.http.HttpSession;
 @Controller
 public class CartController {
-	  @Autowired
-	    private CartService cartService;
 
-	    @GetMapping("/cart")
-	    public String viewCart(HttpSession session, Model model) {
-	        User user = (User) session.getAttribute("user");
-	        if (user == null) {
-	            return "redirect:/login";
-	        }
-	        List<Cart> cartItems = cartService.getCartItems(user.getId());
-	        double totalAmount = cartItems.stream()
-	                                      .mapToDouble(cart -> cart.getProduct().getPrice())
-	                                      .sum();
-	        model.addAttribute("cartItems", cartItems);
-	        model.addAttribute("cartCount", cartItems.size());
-	        model.addAttribute("totalAmount", totalAmount);
-	        return "cart";
-	    }
+    @Autowired
+    private CartService cartService;
 
-	    @PostMapping("/addToCart")
-	    public String addToCart(@RequestParam Long productId, HttpSession session) {
-	        User user = (User) session.getAttribute("user");
-	        if (user == null) {
-	            return "redirect:/login";
-	        }
-	        cartService.addToCart(user.getId(), productId);
-	        return "redirect:/products";
-	    }
+    @GetMapping("/cart")
+    public String viewCart(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+        List<Cart> cartItems = cartService.getCartItems(user.getId());
+        double totalAmount = cartItems.stream()
+                                      .mapToDouble(cart -> cart.getProduct().getPrice())
+                                      .sum();
+        model.addAttribute("cartItems", cartItems);
+        model.addAttribute("cartCount", cartItems.size());
+        model.addAttribute("totalAmount", totalAmount);
+        return "cart";
+    }
 
-	    @PostMapping("/removeFromCart")
-	    public String removeFromCart(@RequestParam Long productId, HttpSession session) {
-	        User user = (User) session.getAttribute("user");
-	        if (user == null) {
-	            return "redirect:/login";
-	        }
-	        cartService.removeFromCart(user.getId(), productId);
-	        return "redirect:/cart";
-	    }
+    @PostMapping("/addToCart")
+    public String addToCart(@RequestParam Long productId, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+        cartService.addToCart(user.getId(), productId);
+        return "redirect:/products";
+    }
 
-	    @GetMapping("/buyNow")
-	    public String buyNow(HttpSession session, Model model) {
-	        User user = (User) session.getAttribute("user");
-	        if (user == null) {
-	            return "redirect:/login";
-	        }
-	        List<Cart> cartItems = cartService.getCartItems(user.getId());
-	        double totalAmount = cartItems.stream()
-	                                      .mapToDouble(cart -> cart.getProduct().getPrice())
-	                                      .sum();
-	        model.addAttribute("user", user);
-	        model.addAttribute("cartItems", cartItems);
-	        model.addAttribute("totalAmount", totalAmount);
-	        return "orderDetails";
-	    }
+    @PostMapping("/removeFromCart")
+    public String removeFromCart(@RequestParam Long productId, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+        cartService.removeFromCart(user.getId(), productId);
+        return "redirect:/cart";
+    }
 
-	    @GetMapping("/orderPlaced")
-	    public String orderPlaced(HttpSession session, Model model) {
-	        User user = (User) session.getAttribute("user");
-	        if (user == null) {
-	            return "redirect:/login";
-	        }
-	        model.addAttribute("message", "Order placed successfully!");
-	        return "orderConfirmation";
-	    }
-	    
-	    @PostMapping("/placeOrder")
-	    public String placeOrder(HttpSession session, Model model) {
-	        User user = (User) session.getAttribute("user");
-	        if (user == null) {
-	            return "redirect:/login";
-	        }
-	        List<Cart> cartItems = cartService.getCartItems(user.getId());
-	        double totalAmount = cartItems.stream()
-	                                      .mapToDouble(cart -> cart.getProduct().getPrice())
-	                                      .sum();
-	        cartService.placeOrder(user, totalAmount);
-	        model.addAttribute("message", "Order placed successfully!");
-	        return "orderConfirmation";
-	    }
+    @GetMapping("/buyNow")
+    public String buyNow(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+        List<Cart> cartItems = cartService.getCartItems(user.getId());
+        double totalAmount = cartItems.stream()
+                                      .mapToDouble(cart -> cart.getProduct().getPrice())
+                                      .sum();
+
+        String deliveryAddress = String.format("%s<br>%s<br>%s<br>%s",
+                                               user.getUsername(),
+                                               user.getEmail(),
+                                               user.getMobileNumber(),
+//                                               user.getPassword(),
+                                               user.getAddress());
+                                               
+
+        String sellerAddress = cartItems.isEmpty() ? "" : String.format("%s<br>%s<br>%s<br>%s<br>%s<br>%s",
+        		                                                        cartItems.get(0).getProduct().getSeller().getName(),
+                                                                        cartItems.get(0).getProduct().getSeller().getStreet(),
+                                                                        cartItems.get(0).getProduct().getSeller().getCity(),
+                                                                        cartItems.get(0).getProduct().getSeller().getState(),
+                                                                        cartItems.get(0).getProduct().getSeller().getZipCode(),
+                                                                        cartItems.get(0).getProduct().getSeller().getCountry());
+
+        model.addAttribute("user", user);
+        model.addAttribute("deliveryAddress", deliveryAddress);
+        model.addAttribute("sellerAddress", sellerAddress);
+        model.addAttribute("totalAmount", totalAmount);
+        return "billing";
+    }
+
+    @PostMapping("/placeOrder")
+    public String placeOrder(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+        List<Cart> cartItems = cartService.getCartItems(user.getId());
+        double totalAmount = cartItems.stream()
+                                      .mapToDouble(cart -> cart.getProduct().getPrice())
+                                      .sum();
+        cartService.placeOrder(user, totalAmount);
+        model.addAttribute("message", "Order placed successfully!");
+        return "orderConfirmation";
+    }
 }
